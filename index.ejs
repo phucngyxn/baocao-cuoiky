@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Đăng nhập | Luyện thi CNTT</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <h2>Đăng nhập hệ thống luyện thi</h2>
+      <form id="login-form">
+        <div class="input-group">
+          <label for="username"> Tên đăng nhập </label>
+          <input type="text" id="username" required />
+        </div>
+
+        <div class="input-group">
+          <label for="password"> Mật khẩu </label>
+          <input type="password" id="password" required />
+        </div>
+
+        <button type="submit">Đăng nhập</button>
+        <p id="error-msg" class="error"></p>
+      </form>
+    </div>
+
+    <script>
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const user = document.getElementById("username").value;
+          const pass = document.getElementById("password").value;
+
+          // Tài khoản mẫu
+          if (user === "phuc.207pm27486" && pass === "123456") {
+            window.location.href = "dashboard";
+          } else {
+            document.getElementById("error-msg").textContent =
+              "Sai tài khoản hoặc mật khẩu!";
+          }
+        });
+    </script>
+  </body>
+</html>

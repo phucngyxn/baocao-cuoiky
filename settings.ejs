@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>⚙️ Cài đặt hệ thống</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="login-container">
+    <h2>⚙️ Cài đặt hệ thống</h2>
+
+    <form id="settings-form">
+      <div class="input-group">
+        <label for="num-questions">🔢 Số câu hỏi mỗi bài:</label>
+        <select id="num-questions">
+          <option value="5">5 câu</option>
+          <option value="10">10 câu</option>
+          <option value="20" selected>20 câu</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="sound-toggle">🔊 Âm thanh phản hồi:</label>
+        <select id="sound-toggle">
+          <option value="on">Bật</option>
+          <option value="off">Tắt</option>
+        </select>
+      </div>
+
+      <button type="submit">💾 Lưu cài đặt</button>
+      <p id="save-msg"></p>
+    </form>
+
+    <a href="/dashboard">
+      <button style="margin-top: 20px;">⬅️ Quay lại menu</button>
+    </a>
+  </div>
+
+  <script>
+    const num = localStorage.getItem("numQuestions");
+    if (num) {
+      document.getElementById("num-questions").value = num;
+    }
+
+    const sound = localStorage.getItem("soundToggle");
+    if (sound) {
+      document.getElementById("sound-toggle").value = sound;
+    }
+
+    document.getElementById("settings-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const numVal = document.getElementById("num-questions").value;
+      const soundVal = document.getElementById("sound-toggle").value;
+
+      localStorage.setItem("numQuestions", numVal);
+      localStorage.setItem("soundToggle", soundVal);
+
+      document.getElementById("save-msg").textContent = "✅ Đã lưu cài đặt!";
+    });
+  </script>
+</body>
+</html>

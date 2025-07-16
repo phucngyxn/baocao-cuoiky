@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>➕ Thêm câu hỏi</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <h2>➕ Thêm câu hỏi</h2>
+
+      <form id="question-form">
+        <div class="input-group">
+          <label>Câu hỏi:</label>
+          <input type="text" id="question" required />
+        </div>
+
+        <div class="input-group">
+          <label>Đáp án A:</label>
+          <input type="text" id="a" required />
+        </div>
+
+        <div class="input-group">
+          <label>Đáp án B:</label>
+          <input type="text" id="b" required />
+        </div>
+
+        <div class="input-group">
+          <label>Đáp án C:</label>
+          <input type="text" id="c" required />
+        </div>
+
+        <div class="input-group">
+          <label>Đáp án D:</label>
+          <input type="text" id="d" required />
+        </div>
+
+        <div class="input-group">
+          <label>Đáp án đúng:</label>
+          <select id="correct">
+            <option value="a">A</option>
+            <option value="b">B</option>
+            <option value="c">C</option>
+            <option value="d">D</option>
+          </select>
+        </div>
+
+        <button type="submit">➕ Thêm câu hỏi</button>
+        <p id="success-msg" style="color: green"></p>
+      </form>
+
+      <hr />
+
+      <div id="question-list">
+        <!-- Danh sách câu hỏi hiển thị ở đây -->
+      </div>
+
+      <button onclick="deleteAllQuestions()">🗑️ Xóa toàn bộ câu hỏi</button>
+      <button onclick="exportJSON()">⬇️ Xuất file JSON</button>
+
+      <a href="/dashboard" class="back-button">⬅️ Quay lại menu</a>
+    </div>
+
+    <script>
+      const listContainer = document.getElementById("question-list");
+      const form = document.getElementById("question-form");
+
+      function getQuestions() {
+        return JSON.parse(localStorage.getItem("questions")) || [];
+      }
+
+      function saveQuestions(list) {
+        localStorage.setItem("questions", JSON.stringify(list));
+      }
+
+      function renderQuestionList() {
+        const list = getQuestions();
+        listContainer.innerHTML = "";
+
+        if (list.length === 0) {
+          listContainer.innerHTML = "<p>⚠️ Chưa có câu hỏi nào.</p>";
+          return;
+        }
+
+        list.forEach((q, index) => {
+          const div = document.createElement("div");
+          div.className = "question-item";
+          div.innerHTML = `
+            <strong>Câu ${index + 1}:</strong> ${q.question}<br>
+            <em>A:</em> ${q.answers.a} |
+            <em>B:</em> ${q.answers.b} |
+            <em>C:</em> ${q.answers.c} |
+            <em>D:</em> ${q.answers.d}<br>
+            <em>Đáp án đúng:</em> ${q.correct.toUpperCase()}<br>
+            <button onclick="deleteQuestion(${index})">❌ Xoá câu này</button>
+          `;
+          listContainer.appendChild(div);
+        });
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const newQuestion = {
+          question: document.getElementById("question").value,
+          answers: {
+            a: document.getElementById("a").value,
+            b: document.getElementById("b").value,
+            c: document.getElementById("c").value,
+            d: document.getElementById("d").value,
+          },
+          correct: document.getElementById("correct").value,
+        };
+
+        const list = getQuestions();
+        list.push(newQuestion);
+        saveQuestions(list);
+
+        document.getElementById("success-msg").textContent = "✅ Đã lưu câu hỏi!";
+        form.reset();
+        renderQuestionList();
+      });
+
+      function deleteQuestion(index) {
+        const list = getQuestions();
+        if (confirm("Bạn có chắc muốn xóa câu hỏi này?")) {
+          list.splice(index, 1);
+          saveQuestions(list);
+          renderQuestionList();
+        }
+      }
+
+      function deleteAllQuestions() {
+        if (confirm("⚠️ Bạn chắc chắn muốn xóa toàn bộ câu hỏi?")) {
+          localStorage.removeItem("questions");
+          renderQuestionList();
+        }
+      }
+
+      function exportJSON() {
+        const data = localStorage.getItem("questions");
+        if (!data) {
+          alert("❌ Không có câu hỏi nào để xuất!");
+          return;
+        }
+
+        const blob = new Blob([data], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "questions.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      // Gọi khi trang tải
+      renderQuestionList();
+    </script>
+  </body>
+</html>

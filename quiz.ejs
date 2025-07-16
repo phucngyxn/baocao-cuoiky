@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Làm bài trắc nghiệm</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <h2>📝 Làm bài trắc nghiệm</h2>
+      
+      <div id="quiz-box">
+        <p id="question-text"></p>
+        <form id="quiz-form">
+          <label><input type="radio" name="answer" value="a" />
+            <span id="a-text"></span></label><br />
+
+          <label><input type="radio" name="answer" value="b" />
+            <span id="b-text"></span></label><br />
+
+          <label><input type="radio" name="answer" value="c" />
+            <span id="c-text"></span></label><br />
+
+          <label><input type="radio" name="answer" value="d" />
+            <span id="d-text"></span></label><br /><br />
+
+          <button type="submit">Trả lời</button>
+        </form>
+        <p id="feedback" style="font-weight: bold"></p>
+      </div>
+      <div id="result-box" style="display: none">
+        <h3>Kết quả:</h3>
+         <p id="score-result"></p>
+  <a href="/dashboard" class="back-button">⬅️ Quay lại menu</a>
+</div>
+    </div>
+    <script>
+      const isSoundEnabled = localStorage.getItem("soundEnabled") === "true";
+
+      const allQuestions = JSON.parse(localStorage.getItem("questions")) || [];
+      const total = parseInt(localStorage.getItem("numQuestions")) || 20; // lấy số câu đã cài đặt
+      const shuffled = allQuestions.sort(() => 0.5 - Math.random());
+      const questions = shuffled.slice(0, total);
+      let current = 0;
+      let score = 0;
+      const questionText = document.getElementById("question-text");
+      const form = document.getElementById("quiz-form");
+      const feedback = document.getElementById("feedback");
+      const resultBox = document.getElementById("result-box");
+      const scoreResult = document.getElementById("score-result");
+      const aText = document.getElementById("a-text");
+      const bText = document.getElementById("b-text");
+      const cText = document.getElementById("c-text");
+      const dText = document.getElementById("d-text");
+      function loadQuestion() {
+        if (current >= questions.length) {
+          showResult();
+          return;
+        }
+        const q = questions[current];
+        questionText.textContent = `Câu ${current + 1}: ${q.question}`;
+        aText.textContent = q.answers.a;
+        bText.textContent = q.answers.b;
+        cText.textContent = q.answers.c;
+        dText.textContent = q.answers.d;
+        feedback.textContent = "";
+        form.reset();
+      }
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const selected = document.querySelector('input[name="answer"]:checked');
+        if (!selected) {
+          feedback.textContent = "❗ Bạn chưa chọn đáp án!";
+          feedback.style.color = "red";
+          return;
+        }
+        const userAnswer = selected.value;
+        const correct = questions[current].correct;
+
+
+       if (userAnswer === correct) {
+          score++;
+          feedback.textContent = "✅ Chính xác!";
+          feedback.style.color = "green";
+  
+         if (localStorage.getItem("soundToggle") === "on") {
+    document.getElementById("correct-sound").play();
+  }
+
+        } 
+       else{
+      feedback.textContent = `❌ Sai! Đáp án đúng là ${correct.toUpperCase()}`;
+      feedback.style.color = "red";
+  
+       if (localStorage.getItem("soundToggle") === "on") {
+    document.getElementById("wrong-sound").play();
+  }
+        }
+
+        // Chờ 1.2 giây rồi qua câu tiếp theo
+        setTimeout(() => {
+          current++;
+          loadQuestion();
+        }, 1000);
+      });
+      function showResult() {
+        document.getElementById("quiz-box").style.display = "none";
+        resultBox.style.display = "block";
+        scoreResult.textContent = `Bạn đúng ${score}/${questions.length} câu. ✅`;
+      }
+      // Load câu đầu tiên khi mở trang
+      if (questions.length > 0) {
+        loadQuestion();
+      } else {
+        questionText.textContent = "❌ Không có câu hỏi nào trong hệ thống.";
+        form.style.display = "none";
+      }
+      
+    </script>
+    <audio id="correct-sound" src="/sound/correct.mp3"></audio>
+    <audio id="wrong-sound" src="/sound/wrong.mp3"></audio>
+  </body>
+</html>

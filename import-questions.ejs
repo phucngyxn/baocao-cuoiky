@@ -1,0 +1,29 @@
+<h3>📤 Nhập câu hỏi từ file JSON</h3>
+<input type="file" id="file-input" accept=".json" />
+<p id="import-result" style="color: green"></p>
+<script>
+  document
+    .getElementById("file-input")
+    .addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        try {
+          const importedQuestions = JSON.parse(event.target.result);
+
+          if (!Array.isArray(importedQuestions)) throw "Sai định dạng file!";
+
+          localStorage.setItem("questions", JSON.stringify(importedQuestions));
+          document.getElementById("import-result").textContent =
+            "✅ Nhập dữ liệu thành công!";
+        } catch (err) {
+          document.getElementById("import-result").textContent =
+            "❌ File không hợp lệ!";
+          document.getElementById("import-result").style.color = "red";
+        }
+      };
+      reader.readAsText(file);
+    });
+</script>
